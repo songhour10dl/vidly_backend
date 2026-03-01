@@ -26,15 +26,25 @@ const genreSchema = new mongoose.Schema({
 
 const Genre = mongoose.model("Genre", genreSchema);
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+  const genres = await Genre.find().select({ name: 1 });
+  console.log(genres);
   res.send(genres);
 });
 
-router.get("/:id", (req, res) => {
-  const genre = genres.find((c) => c.id === parseInt(req.params.id));
-  if (!genre) return res.send("Genre with the given id is not found");
+router.get("/:id", async (req, res) => {
+  try {
+    const genre = await Genre.findById(req.params.id);
+    if (!genre) return res.send("Genre with the given id is not found");
 
-  res.send(genre);
+    res.send(genre);
+  } catch (ex) {
+    console.log("Full Error Object:", ex); // This will show if it's a 'CastError'
+    if (ex.name === "CastError") {
+      return res.status(400).send("That is not a valid MongoDB ObjectId.");
+    }
+    res.status(500).send("Something else went wrong.");
+  }
 });
 
 router.post("/", async (req, res) => {
