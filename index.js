@@ -3,6 +3,7 @@ const Joi = require("joi");
 const express = require("express");
 const genre = require("./routes/genre");
 const homepage = require("./routes/homepage");
+const mongoose = require("mongoose");
 
 const app = express();
 app.use(express.json());
