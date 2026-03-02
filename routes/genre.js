@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+``;
 const Joi = require("joi");
 
 const router = express.Router();
@@ -9,20 +10,9 @@ const schema = Joi.object({
   name: Joi.string().min(3).required(),
 });
 
-const DBPORT = process.env.DBPORT;
-
-mongoose
-  .connect(DBPORT)
-  .then(() => {
-    console.log("Connected to MongoDB ");
-  })
-  .catch((err) => {
-    console.log("Couldn't connect to mongoDB ", err);
-  });
-
 const genreSchema = new mongoose.Schema({
   name: String,
-});
+}); 
 
 const Genre = mongoose.model("Genre", genreSchema);
 
@@ -66,8 +56,8 @@ router.put("/:id", async (req, res) => {
   const { error } = schema.validate(req.body);
   if (error) return res.status(404).send(error.details[0].message);
 
-  const genre = await Genre.findOneAndUpdate(
-    { _id: req.params.id },
+  const genre = await Genre.findByIdAndUpdate(
+    req.params.id,
     { name: req.body.name },
     { new: true },
   );
