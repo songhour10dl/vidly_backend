@@ -61,27 +61,25 @@ router.post("/", async (req, res) => {
     res.status(500).send("Something failed while saving the genre");
   }
 });
+
+router.put("/:id", async (req, res) => {
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(404).send(error.details[0].message);
+
+  const genre = await Genre.findOneAndUpdate(
+    { _id: req.params.id },
+    { name: req.body.name },
+    { new: true },
+  );
+
+  if (!genre) return console.log("Genre witht he given id was not found");
+  res.send(genre);
+});
+
+router.delete("/:id", async (req, res) => {
+  const genre = await Genre.findOneAndDelete({ _id: req.params.id });
+  if (!genre) return console.log("Genre witht he given id was not found");
+  res.send(genre);
+});
+
 module.exports = router;
-
-// router.put("/:id", (req, res) => {
-//   const genre = genres.find((c) => c.id === parseInt(req.params.id));
-//   if (!genre) return res.send("Genre with the given id is not found");
-
-//   const { error } = schema.validate(req.body);
-//   if (error) return res.status(404).send(error.details[0].message);
-
-//   genre.name = req.body.name;
-//   res.send(genre);
-// });
-
-// router.delete("/:id", (req, res) => {
-//   const genre = genres.find((c) => c.id === parseInt(req.params.id));
-//   if (!genre) return res.send("Genre with the given id is not found");
-
-//   const { error } = schema.validate(req.body);
-//   if (error) return res.status(404).send(error.details[0].message);
-
-//   const index = genres.indexOf(genre);
-//   genres.splice(index, 1);
-//   res.send(genre);
-// });
