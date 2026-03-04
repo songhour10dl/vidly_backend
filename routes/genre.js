@@ -1,20 +1,14 @@
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
-``;
+const { Genre } = require("../models/genre");
 const Joi = require("joi");
+const mongoose = require("mongoose");
 
 const router = express.Router();
 
 const schema = Joi.object({
   name: Joi.string().min(3).required(),
 });
-
-const genreSchema = new mongoose.Schema({
-  name: String,
-}); 
-
-const Genre = mongoose.model("Genre", genreSchema);
 
 router.get("/", async (req, res) => {
   const genres = await Genre.find().select({ name: 1 });

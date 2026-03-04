@@ -1,7 +1,8 @@
 require("dotenv").config();
 const express = require("express");
+const Customer = require("../models/customer");
+
 const Joi = require("joi");
-const mongoose = require("mongoose");
 
 const router = express.Router();
 
@@ -10,16 +11,10 @@ const schema = Joi.object({
   phone: Joi.number().min(3).required(),
 });
 
-const customerSchema = new mongoose.Schema({
-  name: String,
-  isGold: Boolean,
-  phone: Number,
-});
-
-const Customer = mongoose.model("Customer", customerSchema);
-
 router.get("/", async (req, res) => {
-  const customer = await Customer.find().select("name isGold phone");
+  const customer = await Customer.find()
+    .select("name isGold phone")
+    .sort("name");
   console.log(customer);
   res.send(customer);
 });
@@ -55,4 +50,26 @@ router.post("/", async (req, res) => {
     res.status(500).send("Something went wrong while saving into DB");
   }
 });
+
+router.put("/:id", async (req, res) => {
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const customer = await Customer.findOneAndUpdate(
+    { _id: req.params.id },
+    { name: req.body.name },
+    { phone: req.body.phone },
+    { new: true },
+  );
+
+  if (!customer) return console.log("Customer with the given id is not found");
+  res.send(customer);
+});
+
+router.delete("/:id", async (req, res) => {
+  const customer = await Customer.findByIdAndDelete(req.params.id);
+  if (!customer) return res.send("Customer with the given id is not found ");
+  res.send(customer);
+});
+
 module.exports = router;
