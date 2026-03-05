@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const { Movie } = require("../models/movie");
+const Movie = require("../models/movie");
 const Joi = require("joi");
 const { Genre } = require("../models/genre");
 
@@ -8,7 +8,7 @@ const router = express.Router();
 
 const schema = Joi.object({
   title: Joi.string().min(3).required(),
-  genreId: Joi.string().alphanum().length(24).required(),
+  genreId: Joi.objectid().required(),
   numberInStock: Joi.number().min(1).required(),
   dailyRentalRate: Joi.number().min(1).required(),
 });

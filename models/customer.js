@@ -11,7 +11,7 @@ const customerSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  name: {
+  phone: {
     type: Number,
     required: true,
     minlength: 5,
@@ -21,5 +21,5 @@ const customerSchema = new mongoose.Schema({
 
 const Customer = mongoose.model("Customer", customerSchema);
 
-module.exports.Customer = Customer;
+module.exports = Customer;
 module.exports.customerSchema = customerSchema;
