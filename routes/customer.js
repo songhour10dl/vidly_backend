@@ -1,3 +1,4 @@
+const auth = require("../middleware/auth");
 require("dotenv").config();
 const express = require("express");
 const Customer = require("../models/customer");
@@ -32,7 +33,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -51,7 +52,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -66,7 +67,7 @@ router.put("/:id", async (req, res) => {
   res.send(customer);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const customer = await Customer.findByIdAndDelete(req.params.id);
   if (!customer) return res.send("Customer with the given id is not found ");
   res.send(customer);

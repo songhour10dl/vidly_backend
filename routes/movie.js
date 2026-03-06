@@ -1,3 +1,4 @@
+const auth = require("../middleware/auth");
 require("dotenv").config();
 const express = require("express");
 const Movie = require("../models/movie");
@@ -31,7 +32,7 @@ router.get("/:id", async (req, res) => {
   res.send(movie);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   console.log("Input GenreId:", req.body.genreId);
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -55,7 +56,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const { error } = schema.validate(req.body);
   if (error) return res.send(error.details[0].message);
 
@@ -76,7 +77,7 @@ router.put("/:id", async (req, res) => {
   res.send(movie);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const movie = await Movie.findOneAndDelete({ _id: req.params.id });
   res.send(movie);
   console.log(movie);

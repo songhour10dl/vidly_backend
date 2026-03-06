@@ -2,12 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const { Genre } = require("../models/genre");
 const Joi = require("joi");
-const mongoose = require("mongoose");
+const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 
 const router = express.Router();
 
 const schema = Joi.object({
-  name: Joi.string().min(3).required(),
+  name: Joi.string().min(5).required(),
 });
 
 router.get("/", async (req, res) => {
@@ -31,7 +32,9 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
+  console.log("Full Request Body:", req.body); // Check if this is {} or undefined
+  console.log("User from Token:", req.user);
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -46,7 +49,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const { error } = schema.validate(req.body);
   if (error) return res.status(404).send(error.details[0].message);
 
@@ -60,9 +63,10 @@ router.put("/:id", async (req, res) => {
   res.send(genre);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
   const genre = await Genre.findOneAndDelete({ _id: req.params.id });
-  if (!genre) return console.log("Genre witht he given id was not found");
+  if (!genre)
+    return res.status(404).send("Genre with the given ID was not found.");
   res.send(genre);
 });
 
