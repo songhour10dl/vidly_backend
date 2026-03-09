@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const config = require("config");
+const error = require("./middleware/error");
 const Joi = require("joi");
 Joi.objectid = require("joi-objectid")(Joi);
 const genre = require("./routes/genre");
@@ -23,7 +23,7 @@ if (!process.env.jwtPrivateKey) {
 const DBPORT = process.env.DBPORT;
 
 mongoose
-  .connect(DBPORT)
+  .connect(process.env.DBPORT)
   .then(() => {
     console.log("Connected to MongoDB ");
   })
@@ -38,6 +38,8 @@ app.use("/api/customer", customer);
 app.use("/api/rental", Rental);
 app.use("/api", User);
 app.use("/api/auth", Auth);
+app.use(error);
+
 
 const port = process.env.PORT;
 
