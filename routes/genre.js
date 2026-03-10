@@ -12,32 +12,26 @@ const schema = Joi.object({
   name: Joi.string().min(5).required(),
 });
 
-router.get(
-  "/",
-  asyncMiddleware(async (req, res) => {
-    const genre = await Genre.find().select("name");
+router.get("/", async (req, res) => {
+  const genre = await Genre.find().select("name");
+  res.send(genre);
+  console.log(genre);
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const genre = await Genre.findById(req.params.id);
+    if (!genre) return res.send("Genre with the given id is not found");
+
     res.send(genre);
-    console.log(genre);
-  }),
-);
-
-router.get(
-  "/:id",
-  asyncMiddleware(async (req, res) => {
-    try {
-      const genre = await Genre.findById(req.params.id);
-      if (!genre) return res.send("Genre with the given id is not found");
-
-      res.send(genre);
-    } catch (ex) {
-      console.log("Full Error Object:", ex); // This will show if it's a 'CastError'
-      if (ex.name === "CastError") {
-        return res.status(400).send("That is not a valid MongoDB ObjectId.");
-      }
-      res.status(500).send("Something else went wrong.");
+  } catch (ex) {
+    console.log("Full Error Object:", ex); // This will show if it's a 'CastError'
+    if (ex.name === "CastError") {
+      return res.status(400).send("That is not a valid MongoDB ObjectId.");
     }
-  }),
-);
+    res.status(500).send("Something else went wrong.");
+  }
+});
 
 router.post("/", auth, async (req, res) => {
   console.log("Full Request Body:", req.body); // Check if this is {} or undefined
