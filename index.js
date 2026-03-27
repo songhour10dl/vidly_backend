@@ -9,10 +9,13 @@ require("./startup/logging")();
 require("./startup/routes")(app);
 require("./startup/dbHelper")();
 require("./startup/config")();
+require("./startup/prod")(app);
 
 const port = process.env.PORT;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   winston.info(`Server is listening to ${port}`);
   console.log(`Server is listening to ${port}`);
 });
+
+module.exports = server;

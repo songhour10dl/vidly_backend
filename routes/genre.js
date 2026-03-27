@@ -1,15 +1,17 @@
 require("dotenv").config();
 const express = require("express");
+const validationObjectId = require("../middleware/validateObejectId");
 const { Genre } = require("../models/genre");
 const Joi = require("joi");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const asyncMiddleware = require("../middleware/async");
+const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
 
 const schema = Joi.object({
-  name: Joi.string().min(5).required(),
+  name: Joi.string().min(5).max(50).required(),
 });
 
 router.get("/", async (req, res) => {
@@ -18,18 +20,15 @@ router.get("/", async (req, res) => {
   console.log(genre);
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validationObjectId, async (req, res) => {
   try {
     const genre = await Genre.findById(req.params.id);
-    if (!genre) return res.send("Genre with the given id is not found");
+    if (!genre)
+      return res.status(404).send("Genre with the given id is not found");
 
     res.send(genre);
   } catch (ex) {
-    console.log("Full Error Object:", ex); // This will show if it's a 'CastError'
-    if (ex.name === "CastError") {
-      return res.status(400).send("That is not a valid MongoDB ObjectId.");
-    }
-    res.status(500).send("Something else went wrong.");
+    console.log("Full Error Object:", ex);
   }
 });
 
